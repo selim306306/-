@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة مدرسة الأمين الابتدائية</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: linear-gradient(135deg, #1e3a5f, #2c5364); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        .header { background: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .header h1 { color: #1e3a5f; font-size: 22px; margin-bottom: 5px; }
+        .header p { color: #666; font-size: 14px; }
+        
+        .avatar-section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; text-align: center; }
+        .avatar-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid #1565c0; transition: transform 0.3s ease; }
+        .avatar-img.speaking { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .status-dot { display: inline-block; width: 14px; height: 14px; background: #4caf50; border-radius: 50%; margin-left: 8px; border: 2px solid white; }
+        .status-dot.speaking { background: #ff9800; animation: blink 0.8s infinite; }
+        @keyframes blink { 50% { opacity: 0.4; } }
+        .avatar-name { margin-top: 12px; font-weight: bold; color: #1e3a5f; font-size: 18px; }
+        .avatar-role { color: #666; font-size: 14px; margin: 8px 0 15px; }
+        
+        .voice-toggle { margin: 10px 0; font-size: 14px; color: #555; }
+        .voice-btn { padding: 10px 18px; border-radius: 25px; border: none; cursor: pointer; font-size: 14px; margin: 5px; }
+        .play-btn { background: #1565c0; color: white; }
+        .stop-btn { background: #e53935; color: white; }
+        
+        .chat-box { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: #f8fbfe; }
+        .message { margin-bottom: 15px; padding: 12px 18px; border-radius: 18px; max-width: 80%; line-height: 1.7; }
+        .bot { background: #e3f2fd; color: #1565c0; margin-left: 0; border-bottom-left-radius: 5px; }
+        .user { background: #e8f5e9; color: #2e7d32; margin-right: 0; margin-left: auto; border-bottom-right-radius: 5px; }
+        .thinking { font-style: italic; color: #888 !important; }
+        
+        .input-area { display: flex; padding: 15px; border-top: 1px solid #eee; }
+        #userInput { flex: 1; padding: 14px 20px; border: 2px solid #ddd; border-radius: 30px; font-size: 16px; outline: none; }
+        #userInput:focus { border-color: #1565c0; }
+        button { padding: 14px 25px; background: #1565c0; color: white; border: none; border-radius: 30px; margin-right: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #0d47a1; }
+        
+        .admin-link { text-align: center; margin-top: 15px; }
+        .admin-link a { color: white; text-decoration: none; font-size: 14px; opacity: 0.8; }
+        .admin-panel { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; }
+        .admin-panel h2 { color: #1e3a5f; margin-bottom: 20px; }
+        .visitor-item { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .export-btn { background: #2e7d32; margin-top: 15px; }
+        .export-btn:hover { background: #1b5e20; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 مكتبة مدرسة الأمين الابتدائية — بورسعيد</h1>
+            <p>أهلاً وسهلاً بيكم</p>
+        </div>
+
+        <div class="avatar-section">
+            <img id="avatarImg" class="avatar-img" src="https://i.imgur.com/8Z9XZLx.png" alt="مساعد المكتبة">
+            <h3 class="avatar-name">الأستاذ محمد حامد <span id="statusDot" class="status-dot"></span></h3>
+            <p class="avatar-role">أخصائي أول مكتبات</p>
+            
+            <div class="voice-toggle">
+                <label>
+                    <input type="checkbox" id="autoSpeak" checked> تشغيل الصوت تلقائيًا
+                </label>
+            </div>
+            <div>
+                <button class="voice-btn play-btn" onclick="speakLast()">🔊 اسمع الكلام</button>
+                <button class="voice-btn stop-btn" onclick="stopSpeak()">🔇 أوقف</button>
+            </div>
+        </div>
+
+        <div class="chat-box">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="اكتب اسمك هنا...">
+                <button onclick="sendMessage()">إرسال</button>
+            </div>
+        </div>
+
+        <div class="admin-link">
+            <a href="#" onclick="showAdmin()">⚙️ لوحة التحكم</a>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <h2>📋 سجل الزوار</h2>
+            <div id="visitorList"></div>
+            <button class="export-btn" onclick="exportData()">📄 تصدير للطباعة</button>
+            <button onclick="clearAll()">🗑️ مسح الكل</button>
+        </div>
+    </div>
+
+<script>
+const GEMINI_API_KEY = "AIzaSyC98VZfYb5sWkYtqX7rM8p9Qz9vX7rM8p9Qz9vX7rM";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+
+let visitors = JSON.parse(localStorage.getItem('visitors') || '[]');
+let greeted = localStorage.getItem('greeted') === 'true';
+let currentStep = greeted ? 99 : 0;
+let visitorData = { name: '', job: '', purpose: '', timestamp: '' };
+let lastReply = '';
+
+// ================== الصوت باللهجة المصرية ==================
+function speakText(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ar-EG';
+    utter.rate = 0.92;
+    utter.pitch = 1.02;
+    
+    utter.onstart = () => {
+        document.getElementById('avatarImg').classList.add('speaking');
+        document.getElementById('statusDot').classList.add('speaking');
+    };
+    utter.onend = () => {
+        document.getElementById('avatarImg').classList.remove('speaking');
+        document.getElementById('statusDot').classList.remove('speaking');
+    };
+    
+    window.speechSynthesis.speak(utter);
+}
+
+function autoSpeak(text) {
+    if (document.getElementById('autoSpeak').checked) speakText(text);
+}
+
+function speakLast() { if (lastReply) speakText(lastReply); }
+function stopSpeak() { 
+    window.speechSynthesis?.cancel(); 
+    document.getElementById('avatarImg').classList.remove('speaking');
+    document.getElementById('statusDot').classList.remove('speaking');
+}
+
+// ================== البداية ==================
+window.onload = function() {
+    if (!greeted) {
+        const welcome = "أهلاً وسهلاً بيكم في مكتبة مدرسة الأمين الابتدائية يا جماعة 😊 من فضلكم اكتبوا اسمكم الكريم.";
+        addMessage(welcome, 'bot');
+        lastReply = welcome;
+        autoSpeak(welcome);
+    } else {
+        const welcomeBack = "أهلاً بعودتكم يا رب 🤍 نورتونا تاني.";
+        addMessage(welcomeBack, 'bot');
+        lastReply = welcomeBack;
+        autoSpeak(welcomeBack);
+    }
+    updateVisitorList();
+};
+
+// ================== إرسال الرسالة ==================
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    addMessage(text, 'user');
+    input.value = '';
+    stopSpeak();
+    
+    if (currentStep === 0) {
+        visitorData.name = text;
+        currentStep = 1;
+        const r = `تمام يا ${text} 😊 وظيفتك إيه؟ طالب ولا معلم ولا زائر؟`;
+        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
+    } 
+    else if (currentStep === 1) {
+        visitorData.job = text;
+        currentStep = 2;
+        const r = "ممتاز 👍 وإيه الغرض من الزيارة النهاردة؟";
+        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
+    } 
+    else if (currentStep === 2) {
+        visitorData.purpose = text;
+        visitorData.timestamp = new Date().toLocaleString('ar-EG');
+        visitors.push({...visitorData});
+        localStorage.setItem('visitors', JSON.stringify(visitors));
+        localStorage.setItem('greeted', 'true');
+        greeted = true;
+        currentStep = 99;
+        
+        const r = `شكراً ليك يا ${visitorData.name} 🤝 تم تسجيل بياناتك، أتمنى تقضي وقت ممتع ومفيد معانا في المكتبة 📚✨`;
+        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); updateVisitorList(); }, 500);
+    } 
+    else {
+        askAI(text);
+    }
+}
+
+// ================== الذكاء الاصطناعي ==================
+async function askAI(question) {
+    addMessage("أفكر... 🤔", 'bot thinking');
+    
+    const systemPrompt = `أنت الأستاذ محمد حامد، أخصائي أول مكتبات في مدرسة الأمين الابتدائية ببورسعيد.
+اتكلم باللهجة المصرية الدارجة المعتدلة — ودود ومحترم.
+معلوماتك:
+- المدرسة: الأمين الابتدائية — بورسعيد
+- ساعات العمل: من 8 صباحًا لحد 2 ظهرًا
+- الخدمات: إعارة كتب، قراءة، بحوث، أنشطة طلابية
+- لو مش عارف الإجابة قول: "سأتابع سؤالك بنفسي فوراً بإذن الله"`;
+
+    try {
+        const res = await fetch(GEMINI_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nسؤال: " + question }] }] })
+        });
+        const data = await res.json();
+        document.querySelector('.thinking')?.remove();
+        
+        if (data.candidates?.[0]?.content) {
+            lastReply = data.candidates[0].content.parts[0].text;
+            addMessage(lastReply, 'bot');
+            autoSpeak(lastReply);
+        } else throw Error('لا رد');
+    } catch {
+        document.querySelector('.thinking')?.remove();
+        lastReply = "أعتذر منك، سأجيبك بنفسي فوراً بإذن الله.";
+        addMessage(lastReply, 'bot');
+        autoSpeak(lastReply);
+    }
+}
+
+// ================== مساعدة ==================
+function addMessage(text, type) {
+    if (type === 'bot' && !text.includes('أفكر')) lastReply = text;
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    div.textContent = text;
+    document.getElementById('chatMessages').appendChild(div);
+    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+}
+
+function updateVisitorList() {
+    const list = document.getElementById('visitorList');
+    list.innerHTML = visitors.length ? '' : '<p style="color:#888; text-align:center;">لا يوجد زوار مسجلون حتى الآن</p>';
+    visitors.forEach((v, i) => {
+        list.innerHTML += `
+            <div class="visitor-item">
+                <strong>${i+1}. ${v.name}</strong><br>
+                الوظيفة: ${v.job}<br>
+                الغرض: ${v.purpose}<br>
+                <small style="color:#888;">${v.timestamp}</small>
+            </div>`;
+    });
+}
+
+function showAdmin() {
+    if (prompt("كلمة المرور:") === "admin123") {
+        document.getElementById('adminPanel').style.display = 'block';
+        updateVisitorList();
+    } else alert("كلمة المرور غلط ❌");
+}
+
+function exportData() {
+    let text = "سجل زوار مكتبة مدرسة الأمين الابتدائية — بورسعيد\n" + "=".repeat(50) + "\n";
+    visitors.forEach((v, i) => {
+        text += `${i+1}. الاسم: ${v.name}\n   الوظيفة: ${v.job}\n   الغرض: ${v.purpose}\n   التاريخ: ${v.timestamp}\n\n`;
+    });
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'سجل_الزوار_' + new Date().toLocaleDateString('ar-EG').replace(/\//g,'-') + '.txt';
+    a.click();
+}
+
+function clearAll() {
+    if (confirm("تمسح كل البيانات؟ ده مش راجع!")) {
+        localStorage.clear();
+        visitors = [];
+        greeted = false;
+        currentStep = 0;
+        document.getElementById('chatMessages').innerHTML = '';
+        document.getElementById('visitorList').innerHTML = '';
+        window.onload();
+    }
+}
+
+document.getElementById('userInput').addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
+</script>
+</body>
+</html>
