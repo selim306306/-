@@ -62,7 +62,7 @@
         </div>
 
         <div class="avatar-section">
-            <img id="avatarImg" class="avatar-img" src="https://i.imgur.com/8Z9XZLx.png" alt="مساعد المكتبة">
+            <img id="avatarImg" class="avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="مساعد المكتبة">
             <h3 class="avatar-name">الأستاذ محمد حامد <span id="statusDot" class="status-dot"></span></h3>
             <p class="avatar-role">أخصائي أول مكتبات</p>
             
@@ -107,11 +107,15 @@ let currentStep = greeted ? 99 : 0;
 let visitorData = { name: '', job: '', purpose: '', timestamp: '' };
 let lastReply = '';
 
-// ================== الصوت باللهجة المصرية ==================
+function cleanText(text) {
+  return text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '');
+}
+
 function speakText(text) {
-    if (!window.speechSynthesis) return;
+    const safeText = cleanText(text);
+    if (!window.speechSynthesis || !safeText.trim()) return;
     window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
+    const utter = new SpeechSynthesisUtterance(safeText);
     utter.lang = 'ar-EG';
     utter.rate = 0.92;
     utter.pitch = 1.02;
@@ -139,15 +143,14 @@ function stopSpeak() {
     document.getElementById('statusDot').classList.remove('speaking');
 }
 
-// ================== البداية ==================
 window.onload = function() {
     if (!greeted) {
-        const welcome = "أهلاً وسهلاً بيكم في مكتبة مدرسة الأمين الابتدائية يا جماعة 😊 من فضلكم اكتبوا اسمكم الكريم.";
+        const welcome = "أهلاً وسهلاً بيكم في مكتبة مدرسة الأمين الابتدائية يا جماعة. من فضلكم اكتبوا اسمكم الكريم.";
         addMessage(welcome, 'bot');
         lastReply = welcome;
         autoSpeak(welcome);
     } else {
-        const welcomeBack = "أهلاً بعودتكم يا رب 🤍 نورتونا تاني.";
+        const welcomeBack = "أهلاً بعودتكم يا رب. نورتونا تاني.";
         addMessage(welcomeBack, 'bot');
         lastReply = welcomeBack;
         autoSpeak(welcomeBack);
@@ -155,7 +158,6 @@ window.onload = function() {
     updateVisitorList();
 };
 
-// ================== إرسال الرسالة ==================
 function sendMessage() {
     const input = document.getElementById('userInput');
     const text = input.value.trim();
@@ -168,13 +170,13 @@ function sendMessage() {
     if (currentStep === 0) {
         visitorData.name = text;
         currentStep = 1;
-        const r = `تمام يا ${text} 😊 وظيفتك إيه؟ طالب ولا معلم ولا زائر؟`;
+        const r = `تمام يا ${text}. وظيفتك إيه؟ طالب ولا معلم ولا زائر؟`;
         setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
     } 
     else if (currentStep === 1) {
         visitorData.job = text;
         currentStep = 2;
-        const r = "ممتاز 👍 وإيه الغرض من الزيارة النهاردة؟";
+        const r = "ممتاز. وإيه الغرض من الزيارة النهاردة؟";
         setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
     } 
     else if (currentStep === 2) {
@@ -186,7 +188,7 @@ function sendMessage() {
         greeted = true;
         currentStep = 99;
         
-        const r = `شكراً ليك يا ${visitorData.name} 🤝 تم تسجيل بياناتك، أتمنى تقضي وقت ممتع ومفيد معانا في المكتبة 📚✨`;
+        const r = `شكراً ليك يا ${visitorData.name}. تم تسجيل بياناتك، أتمنى تقضي وقت ممتع ومفيد معانا في المكتبة.`;
         setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); updateVisitorList(); }, 500);
     } 
     else {
@@ -194,12 +196,11 @@ function sendMessage() {
     }
 }
 
-// ================== الذكاء الاصطناعي ==================
 async function askAI(question) {
-    addMessage("أفكر... 🤔", 'bot thinking');
+    addMessage("أفكر...", 'bot thinking');
     
     const systemPrompt = `أنت الأستاذ محمد حامد، أخصائي أول مكتبات في مدرسة الأمين الابتدائية ببورسعيد.
-اتكلم باللهجة المصرية الدارجة المعتدلة — ودود ومحترم.
+اتكلم باللهجة المصرية المعتدلة — ودود ومحترم.
 معلوماتك:
 - المدرسة: الأمين الابتدائية — بورسعيد
 - ساعات العمل: من 8 صباحًا لحد 2 ظهرًا
@@ -228,7 +229,6 @@ async function askAI(question) {
     }
 }
 
-// ================== مساعدة ==================
 function addMessage(text, type) {
     if (type === 'bot' && !text.includes('أفكر')) lastReply = text;
     const div = document.createElement('div');
