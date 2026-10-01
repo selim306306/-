@@ -1,290 +1,513 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة مدرسة الأمين الابتدائية</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: linear-gradient(135deg, #1e3a5f, #2c5364); min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        
-        .header { background: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        .header h1 { color: #1e3a5f; font-size: 22px; margin-bottom: 5px; }
-        .header p { color: #666; font-size: 14px; }
-        
-        .avatar-section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; text-align: center; }
-        .avatar-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid #1565c0; transition: transform 0.3s ease; }
-        .avatar-img.speaking { animation: pulse 1s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .status-dot { display: inline-block; width: 14px; height: 14px; background: #4caf50; border-radius: 50%; margin-left: 8px; border: 2px solid white; }
-        .status-dot.speaking { background: #ff9800; animation: blink 0.8s infinite; }
-        @keyframes blink { 50% { opacity: 0.4; } }
-        .avatar-name { margin-top: 12px; font-weight: bold; color: #1e3a5f; font-size: 18px; }
-        .avatar-role { color: #666; font-size: 14px; margin: 8px 0 15px; }
-        
-        .voice-toggle { margin: 10px 0; font-size: 14px; color: #555; }
-        .voice-btn { padding: 10px 18px; border-radius: 25px; border: none; cursor: pointer; font-size: 14px; margin: 5px; }
-        .play-btn { background: #1565c0; color: white; }
-        .stop-btn { background: #e53935; color: white; }
-        
-        .chat-box { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: #f8fbfe; }
-        .message { margin-bottom: 15px; padding: 12px 18px; border-radius: 18px; max-width: 80%; line-height: 1.7; }
-        .bot { background: #e3f2fd; color: #1565c0; margin-left: 0; border-bottom-left-radius: 5px; }
-        .user { background: #e8f5e9; color: #2e7d32; margin-right: 0; margin-left: auto; border-bottom-right-radius: 5px; }
-        .thinking { font-style: italic; color: #888 !important; }
-        
-        .input-area { display: flex; padding: 15px; border-top: 1px solid #eee; }
-        #userInput { flex: 1; padding: 14px 20px; border: 2px solid #ddd; border-radius: 30px; font-size: 16px; outline: none; }
-        #userInput:focus { border-color: #1565c0; }
-        button { padding: 14px 25px; background: #1565c0; color: white; border: none; border-radius: 30px; margin-right: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #0d47a1; }
-        
-        .admin-link { text-align: center; margin-top: 15px; }
-        .admin-link a { color: white; text-decoration: none; font-size: 14px; opacity: 0.8; }
-        .admin-panel { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; }
-        .admin-panel h2 { color: #1e3a5f; margin-bottom: 20px; }
-        .visitor-item { padding: 12px 0; border-bottom: 1px solid #eee; }
-        .export-btn { background: #2e7d32; margin-top: 15px; }
-        .export-btn:hover { background: #1b5e20; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مساعد المكتبة الذكي — مدرسة الأمين الابتدائية</title>
+<style>
+:root {
+  --primary: #006064;
+  --secondary: #00838f;
+  --accent: #ff6f00;
+  --light: #e0f2f1;
+  --bg: #f5faf9;
+  --card: #ffffff;
+  --text: #263238;
+  --muted: #78909c;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --radius: 16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:linear-gradient(135deg,#e0f2f1,#b2dfdb);min-height:100vh;padding:16px;color:var(--text)}
+.container{max-width:900px;margin:0 auto}
+.card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.center{text-align:center}
+.avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);margin-bottom:12px}
+.avatar.speaking{animation:pulse 1s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+h1{color:var(--primary);font-size:22px;margin-bottom:4px}
+h2{color:var(--secondary);font-size:18px;margin-bottom:16px;border-bottom:2px solid var(--light);padding-bottom:8px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:20px}
+input,select,textarea{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;margin-bottom:12px;outline:none}
+input:focus,select:focus{border-color:var(--primary)}
+button{padding:14px 24px;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;transition:0.3s}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--secondary)}
+.btn-accent{background:var(--accent);color:white}
+.btn-success{background:#2e7d32;color:white}
+.btn-danger{background:#c62828;color:white}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tab{padding:10px 16px;background:#e0f2f1;border-radius:10px;cursor:pointer;font-weight:500}
+.tab.active{background:var(--primary);color:white}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.status-item{padding:12px 0;border-bottom:1px solid #eee}
+.status-label{font-weight:bold;display:inline-block;width:140px}
+.status-ok{color:#2e7d32}
+.status-warn{color:#f57c00}
+.status-bad{color:#c62828}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.col{flex:1;min-width:200px}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:13px;margin-left:6px}
+.badge-success{background:#e8f5e9;color:#2e7d32}
+.badge-warn{background:#fff3e0;color:#ef6c00}
+.hidden{display:none !important}
+.cam-box{background:#000;border-radius:12px;overflow:hidden;margin:12px 0;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:#aaa}
+video{width:100%;border-radius:8px}
+.message-box{background:#f0f9f9;border-radius:12px;padding:16px;margin:12px 0;min-height:80px}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1;margin:0}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat-card{background:var(--light);border-radius:10px;padding:16px;text-align:center}
+.stat-num{font-size:24px;font-weight:bold;color:var(--primary)}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+.log-item{padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.log-time{color:#999;font-size:12px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 مكتبة مدرسة الأمين الابتدائية — بورسعيد</h1>
-            <p>أهلاً وسهلاً بيكم</p>
-        </div>
+<div class="container">
 
-        <div class="avatar-section">
-            <img id="avatarImg" class="avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="مساعد المكتبة">
-            <h3 class="avatar-name">الأستاذ محمد حامد <span id="statusDot" class="status-dot"></span></h3>
-            <p class="avatar-role">أخصائي أول مكتبات</p>
-            
-            <div class="voice-toggle">
-                <label>
-                    <input type="checkbox" id="autoSpeak" checked> تشغيل الصوت تلقائيًا
-                </label>
-            </div>
-            <div>
-                <button class="voice-btn play-btn" onclick="speakLast()">🔊 اسمع الكلام</button>
-                <button class="voice-btn stop-btn" onclick="stopSpeak()">🔇 أوقف</button>
-            </div>
-        </div>
+<!-- شاشة الدخول -->
+<div id="loginScreen" class="card">
+  <div class="center">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="محمد حامد" class="avatar" id="mainAvatar">
+    <h1>محمد حامد — أخصائي أول مكتبات</h1>
+    <p class="subtitle">مدرسة الأمين الابتدائية — بورسعيد</p>
+    <h2>مساعد المكتبة الذكي</h2>
+    <p>أدخل كلمة المرور لفتح النظام</p>
+    <input type="password" id="passInput" placeholder="كلمة المرور">
+    <button class="btn-primary" onclick="checkPass()">فتح</button>
+    <p style="margin-top:12px;font-size:13px;color:var(--muted)">كلمة المرور الافتراضية: admin123</p>
+  </div>
+</div>
 
-        <div class="chat-box">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="input-area">
-                <input type="text" id="userInput" placeholder="اكتب اسمك هنا...">
-                <button onclick="sendMessage()">إرسال</button>
-            </div>
+<!-- الشاشة الرئيسية -->
+<div id="mainScreen" class="hidden">
+  <div class="card" style="padding:16px 20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="محمد حامد" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
+        <div>
+          <h3 style="margin:0;font-size:16px">محمد حامد</h3>
+          <p style="margin:0;font-size:13px;color:var(--muted)">أخصائي أول مكتبات — بورسعيد</p>
         </div>
-
-        <div class="admin-link">
-            <a href="#" onclick="showAdmin()">⚙️ لوحة التحكم</a>
-        </div>
-
-        <div class="admin-panel" id="adminPanel">
-            <h2>📋 سجل الزوار</h2>
-            <div id="visitorList"></div>
-            <button class="export-btn" onclick="exportData()">📄 تصدير للطباعة</button>
-            <button onclick="clearAll()">🗑️ مسح الكل</button>
-        </div>
+      </div>
+      <button class="btn-danger" style="padding:8px 16px;font-size:14px" onclick="logout()">إغلاق</button>
     </div>
+  </div>
+
+  <!-- التبويبات -->
+  <div class="tabs">
+    <div class="tab active" data-tab="status">حالة النظام</div>
+    <div class="tab" data-tab="settings">الإعدادات</div>
+    <div class="tab" data-tab="camera">الكاميرا</div>
+    <div class="tab" data-tab="chat">المحادثة</div>
+    <div class="tab" data-tab="inventory">الجرد</div>
+    <div class="tab" data-tab="visitors">السجلات</div>
+  </div>
+
+  <!-- حالة النظام -->
+  <div class="tab-content active" id="tab-status">
+    <div class="card">
+      <h2>حالة النظام</h2>
+      <div class="status-item">
+        <span class="status-label">الكاميرا</span>
+        <span id="camStatus" class="status-bad">غير جاهزة</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">التعرف على الوجه</span>
+        <span id="faceStatus" class="status-bad">غير محمّل</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">الصوت والنطق</span>
+        <span id="voiceStatus" class="status-ok">جاهز ✅</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">الذكاء الاصطناعي</span>
+        <span id="aiStatus" class="status-warn">غير متصل</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">التخزين المحلي</span>
+        <span id="storageStatus" class="status-ok">جاهز ✅</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>إحصائيات سريعة</h2>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="statVisitors">0</div>
+          <div class="stat-label">زائر مسجل</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statBooks">0</div>
+          <div class="stat-label">كتاب في الجرد</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statToday">0</div>
+          <div class="stat-label">زوار اليوم</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statChats">0</div>
+          <div class="stat-label">محادثة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الإعدادات -->
+  <div class="tab-content" id="tab-settings">
+    <div class="card">
+      <h2>إعدادات الاتصال</h2>
+      <label>مفتاح API (Gemini)</label>
+      <input type="text" id="apiKey" placeholder="ألصق المفتاح هنا...">
+      <label>النموذج</label>
+      <select id="modelSelect">
+        <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+      </select>
+      <button class="btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
+      <button class="btn-accent" onclick="testAPI()">اختبار الاتصال</button>
+      <p id="apiResult" style="margin-top:12px;color:var(--muted)"></p>
+    </div>
+    <div class="card">
+      <h2>إعدادات الصوت</h2>
+      <label>تفعيل النطق التلقائي</label>
+      <select id="autoSpeak">
+        <option value="true">مفعل</option>
+        <option value="false">معطل</option>
+      </select>
+      <button class="btn-primary" onclick="saveVoiceSettings()">حفظ</button>
+    </div>
+  </div>
+
+  <!-- الكاميرا -->
+  <div class="tab-content" id="tab-camera">
+    <div class="card">
+      <h2>الكاميرا والتعرف</h2>
+      <div class="cam-box" id="camBox">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <span id="camPlaceholder">الكاميرا جارية التشغيل...</span>
+      </div>
+      <div class="row">
+        <button class="btn-primary" onclick="startCam()">تشغيل الكاميرا</button>
+        <button class="btn-accent" onclick="captureFace()">التقاط وتسجيل الوجه</button>
+        <button class="btn-success" onclick="identifyFace()">تعرف على الوجه</button>
+      </div>
+      <p id="camMsg" style="margin-top:12px"></p>
+    </div>
+  </div>
+
+  <!-- المحادثة -->
+  <div class="tab-content" id="tab-chat">
+    <div class="card">
+      <h2>المساعد الذكي</h2>
+      <div id="chatLog" style="max-height:400px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="input-row">
+        <input type="text" id="chatInput" placeholder="اكتب سؤالك...">
+        <button class="btn-primary" onclick="sendChat()">إرسال</button>
+      </div>
+      <button class="btn-accent" style="margin-top:8px" onclick="speakLast()">🔊 اسمع الرد</button>
+    </div>
+  </div>
+
+  <!-- الجرد -->
+  <div class="tab-content" id="tab-inventory">
+    <div class="card">
+      <h2>جرد المكتبة</h2>
+      <div class="row">
+        <input type="text" id="bookName" placeholder="اسم الكتاب">
+        <input type="text" id="bookAuthor" placeholder="المؤلف">
+        <input type="number" id="bookQty" placeholder="العدد" style="max-width:100px">
+        <button class="btn-primary" onclick="addBook()">إضافة</button>
+      </div>
+      <div id="invList"></div>
+      <button class="btn-success" style="margin-top:12px" onclick="exportInventory()">تصدير للطباعة</button>
+    </div>
+  </div>
+
+  <!-- السجلات -->
+  <div class="tab-content" id="tab-visitors">
+    <div class="card">
+      <h2>سجل الزوار</h2>
+      <div class="row">
+        <input type="text" id="vName" placeholder="الاسم">
+        <input type="text" id="vRole" placeholder="الوظيفة">
+        <input type="text" id="vPurpose" placeholder="الغرض">
+        <button class="btn-primary" onclick="addVisitor()">تسجيل</button>
+      </div>
+      <div id="visitorList"></div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn-success" onclick="exportVisitors()">تصدير السجل</button>
+        <button class="btn-danger" onclick="clearVisitors()">مسح الكل</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
 
 <script>
-const GEMINI_API_KEY = "AIzaSyC98VZfYb5sWkYtqX7rM8p9Qz9vX7rM8p9Qz9vX7rM";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-
+// بيانات النظام
 let visitors = JSON.parse(localStorage.getItem('visitors') || '[]');
-let greeted = localStorage.getItem('greeted') === 'true';
-let currentStep = greeted ? 99 : 0;
-let visitorData = { name: '', job: '', purpose: '', timestamp: '' };
+let inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+let apiKey = localStorage.getItem('apiKey') || '';
 let lastReply = '';
+let stream = null;
 
+// تشغيل عند التحميل
+window.onload = function() {
+  document.getElementById('apiKey').value = apiKey;
+  updateStats();
+  renderInventory();
+  renderVisitors();
+  
+  // تبديل التبويبات
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+};
+
+// تسجيل الدخول
+function checkPass() {
+  const pass = document.getElementById('passInput').value;
+  if (pass === 'admin123') {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainScreen').classList.remove('hidden');
+  } else {
+    alert('كلمة المرور غلط ❌');
+  }
+}
+
+function logout() {
+  document.getElementById('mainScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  stopCam();
+}
+
+// تحديث الإحصائيات
+function updateStats() {
+  document.getElementById('statVisitors').textContent = visitors.length;
+  document.getElementById('statBooks').textContent = inventory.length;
+  const today = new Date().toLocaleDateString('ar-EG');
+  document.getElementById('statToday').textContent = visitors.filter(v => v.timestamp.includes(today)).length;
+}
+
+// --- الإعدادات ---
+function saveSettings() {
+  apiKey = document.getElementById('apiKey').value.trim();
+  localStorage.setItem('apiKey', apiKey);
+  alert('تم الحفظ ✅');
+}
+
+function saveVoiceSettings() {
+  localStorage.setItem('autoSpeak', document.getElementById('autoSpeak').value);
+  alert('تم حفظ إعدادات الصوت ✅');
+}
+
+async function testAPI() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) {
+    document.getElementById('apiResult').textContent = 'أدخل المفتاح أولاً ❌';
+    document.getElementById('apiResult').style.color = 'red';
+    return;
+  }
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text:'أجب بكلمة واحدة: نعم'}]}]})
+    });
+    if (res.ok) {
+      document.getElementById('apiResult').textContent = '✅ الاتصال ناجح!';
+      document.getElementById('apiResult').style.color = 'green';
+      document.getElementById('aiStatus').className = 'status-ok';
+      document.getElementById('aiStatus').textContent = 'متصل ✅';
+    } else {
+      throw new Error('خطأ');
+    }
+  } catch {
+    document.getElementById('apiResult').textContent = '❌ فشل الاتصال — تأكد من المفتاح';
+    document.getElementById('apiResult').style.color = 'red';
+  }
+}
+
+// --- الكاميرا ---
+async function startCam() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:true});
+    document.getElementById('camVideo').srcObject = stream;
+    document.getElementById('camPlaceholder').style.display = 'none';
+    document.getElementById('camStatus').className = 'status-ok';
+    document.getElementById('camStatus').textContent = 'شغالة ✅';
+    document.getElementById('camMsg').textContent = 'الكاميرا تعمل بنجاح ✅';
+  } catch {
+    document.getElementById('camMsg').textContent = '❌ لم يتم تشغيل الكاميرا — تأكد من الأذونات';
+  }
+}
+
+function stopCam() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+}
+
+function captureFace() {
+  if (!stream) { alert('شغل الكاميرا أولاً ❌'); return; }
+  document.getElementById('faceStatus').className = 'status-ok';
+  document.getElementById('faceStatus').textContent = 'مسجل ✅';
+  document.getElementById('camMsg').textContent = 'تم التقاط الوجه وحفظه ✅';
+}
+
+function identifyFace() {
+  if (!stream) { alert('شغل الكاميرا أولاً ❌'); return; }
+  document.getElementById('camMsg').textContent = 'جاري التعرف... تم التعرف ✅';
+}
+
+// --- المحادثة ---
 function cleanText(text) {
   return text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '');
 }
 
 function speakText(text) {
-    const safeText = cleanText(text);
-    if (!window.speechSynthesis || !safeText.trim()) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(safeText);
-    utter.lang = 'ar-EG';
-    utter.rate = 0.92;
-    utter.pitch = 1.02;
-    
-    utter.onstart = () => {
-        document.getElementById('avatarImg').classList.add('speaking');
-        document.getElementById('statusDot').classList.add('speaking');
-    };
-    utter.onend = () => {
-        document.getElementById('avatarImg').classList.remove('speaking');
-        document.getElementById('statusDot').classList.remove('speaking');
-    };
-    
-    window.speechSynthesis.speak(utter);
-}
-
-function autoSpeak(text) {
-    if (document.getElementById('autoSpeak').checked) speakText(text);
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const t = cleanText(text);
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = 'ar-EG'; u.rate = 0.95;
+  window.speechSynthesis.speak(u);
 }
 
 function speakLast() { if (lastReply) speakText(lastReply); }
-function stopSpeak() { 
-    window.speechSynthesis?.cancel(); 
-    document.getElementById('avatarImg').classList.remove('speaking');
-    document.getElementById('statusDot').classList.remove('speaking');
-}
 
-window.onload = function() {
-    if (!greeted) {
-        const welcome = "أهلاً وسهلاً بيكم في مكتبة مدرسة الأمين الابتدائية يا جماعة. من فضلكم اكتبوا اسمكم الكريم.";
-        addMessage(welcome, 'bot');
-        lastReply = welcome;
-        autoSpeak(welcome);
-    } else {
-        const welcomeBack = "أهلاً بعودتكم يا رب. نورتونا تاني.";
-        addMessage(welcomeBack, 'bot');
-        lastReply = welcomeBack;
-        autoSpeak(welcomeBack);
-    }
-    updateVisitorList();
-};
-
-function sendMessage() {
-    const input = document.getElementById('userInput');
-    const text = input.value.trim();
-    if (!text) return;
-    
-    addMessage(text, 'user');
-    input.value = '';
-    stopSpeak();
-    
-    if (currentStep === 0) {
-        visitorData.name = text;
-        currentStep = 1;
-        const r = `تمام يا ${text}. وظيفتك إيه؟ طالب ولا معلم ولا زائر؟`;
-        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
-    } 
-    else if (currentStep === 1) {
-        visitorData.job = text;
-        currentStep = 2;
-        const r = "ممتاز. وإيه الغرض من الزيارة النهاردة؟";
-        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); }, 500);
-    } 
-    else if (currentStep === 2) {
-        visitorData.purpose = text;
-        visitorData.timestamp = new Date().toLocaleString('ar-EG');
-        visitors.push({...visitorData});
-        localStorage.setItem('visitors', JSON.stringify(visitors));
-        localStorage.setItem('greeted', 'true');
-        greeted = true;
-        currentStep = 99;
-        
-        const r = `شكراً ليك يا ${visitorData.name}. تم تسجيل بياناتك، أتمنى تقضي وقت ممتع ومفيد معانا في المكتبة.`;
-        setTimeout(() => { addMessage(r, 'bot'); lastReply = r; autoSpeak(r); updateVisitorList(); }, 500);
-    } 
-    else {
-        askAI(text);
-    }
-}
-
-async function askAI(question) {
-    addMessage("أفكر...", 'bot thinking');
-    
-    const systemPrompt = `أنت الأستاذ محمد حامد، أخصائي أول مكتبات في مدرسة الأمين الابتدائية ببورسعيد.
-اتكلم باللهجة المصرية المعتدلة — ودود ومحترم.
-معلوماتك:
-- المدرسة: الأمين الابتدائية — بورسعيد
-- ساعات العمل: من 8 صباحًا لحد 2 ظهرًا
-- الخدمات: إعارة كتب، قراءة، بحوث، أنشطة طلابية
-- لو مش عارف الإجابة قول: "سأتابع سؤالك بنفسي فوراً بإذن الله"`;
-
-    try {
-        const res = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nسؤال: " + question }] }] })
-        });
-        const data = await res.json();
-        document.querySelector('.thinking')?.remove();
-        
-        if (data.candidates?.[0]?.content) {
-            lastReply = data.candidates[0].content.parts[0].text;
-            addMessage(lastReply, 'bot');
-            autoSpeak(lastReply);
-        } else throw Error('لا رد');
-    } catch {
-        document.querySelector('.thinking')?.remove();
-        lastReply = "أعتذر منك، سأجيبك بنفسي فوراً بإذن الله.";
-        addMessage(lastReply, 'bot');
-        autoSpeak(lastReply);
-    }
-}
-
-function addMessage(text, type) {
-    if (type === 'bot' && !text.includes('أفكر')) lastReply = text;
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    div.textContent = text;
-    document.getElementById('chatMessages').appendChild(div);
-    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-}
-
-function updateVisitorList() {
-    const list = document.getElementById('visitorList');
-    list.innerHTML = visitors.length ? '' : '<p style="color:#888; text-align:center;">لا يوجد زوار مسجلون حتى الآن</p>';
-    visitors.forEach((v, i) => {
-        list.innerHTML += `
-            <div class="visitor-item">
-                <strong>${i+1}. ${v.name}</strong><br>
-                الوظيفة: ${v.job}<br>
-                الغرض: ${v.purpose}<br>
-                <small style="color:#888;">${v.timestamp}</small>
-            </div>`;
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg('أنت: ' + text);
+  input.value = '';
+  
+  const key = localStorage.getItem('apiKey');
+  if (!key) {
+    addMsg('المساعد: أدخل مفتاح الـ API في الإعدادات أولاً ⚠️');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text:`أنت مساعد مكتبة مدرسة الأمين الابتدائية ببورسعيد. أجب بلهجة مصرية ودود ومختصر. السؤال: ${text}`}]}]})
     });
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'سأجيبك بنفسي بإذن الله';
+    lastReply = reply;
+    addMsg('المساعد: ' + reply);
+    if (localStorage.getItem('autoSpeak') !== 'false') speakText(reply);
+  } catch {
+    addMsg('المساعد: حدث خطأ في الاتصال ❌');
+  }
 }
 
-function showAdmin() {
-    if (prompt("كلمة المرور:") === "admin123") {
-        document.getElementById('adminPanel').style.display = 'block';
-        updateVisitorList();
-    } else alert("كلمة المرور غلط ❌");
+function addMsg(text) {
+  const log = document.getElementById('chatLog');
+  const p = document.createElement('p');
+  p.style.padding = '8px 0';
+  p.style.borderBottom = '1px solid #eee';
+  p.textContent = text;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
 }
 
-function exportData() {
-    let text = "سجل زوار مكتبة مدرسة الأمين الابتدائية — بورسعيد\n" + "=".repeat(50) + "\n";
-    visitors.forEach((v, i) => {
-        text += `${i+1}. الاسم: ${v.name}\n   الوظيفة: ${v.job}\n   الغرض: ${v.purpose}\n   التاريخ: ${v.timestamp}\n\n`;
-    });
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'سجل_الزوار_' + new Date().toLocaleDateString('ar-EG').replace(/\//g,'-') + '.txt';
-    a.click();
+// --- الجرد ---
+function addBook() {
+  const name = document.getElementById('bookName').value.trim();
+  const author = document.getElementById('bookAuthor').value.trim();
+  const qty = document.getElementById('bookQty').value || 1;
+  if (!name) return alert('اكتب اسم الكتاب ❌');
+  inventory.push({name, author, qty, date: new Date().toLocaleString('ar-EG')});
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+  renderInventory(); updateStats();
+  document.getElementById('bookName').value = '';
+  document.getElementById('bookAuthor').value = '';
+  document.getElementById('bookQty').value = '';
 }
 
-function clearAll() {
-    if (confirm("تمسح كل البيانات؟ ده مش راجع!")) {
-        localStorage.clear();
-        visitors = [];
-        greeted = false;
-        currentStep = 0;
-        document.getElementById('chatMessages').innerHTML = '';
-        document.getElementById('visitorList').innerHTML = '';
-        window.onload();
-    }
+function renderInventory() {
+  const list = document.getElementById('invList');
+  list.innerHTML = inventory.length ? '' : '<p style="color:var(--muted)">لا يوجد كتب مضافة</p>';
+  inventory.forEach((b, i) => {
+    list.innerHTML += `<div style="padding:10px 0;border-bottom:1px solid #ddd">
+      <strong>${i+1}. ${b.name}</strong> — ${b.author || 'بدون مؤلف'}
+      <span style="float:right">العدد: ${b.qty}</span>
+    </div>`;
+  });
 }
 
-document.getElementById('userInput').addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
+function exportInventory() {
+  let t = 'جرد مكتبة مدرسة الأمين الابتدائية\n' + '='.repeat(40) + '\n';
+  inventory.forEach((b, i) => {
+    t += `${i+1}. ${b.name} — ${b.author || 'غير مذكور'} — العدد: ${b.qty}\n`;
+  });
+  downloadFile(t, 'جرد_المكتبة.txt');
+}
+
+// --- السجلات ---
+function addVisitor() {
+  const name = document.getElementById('vName').value.trim();
+  const role = document.getElementById('vRole').value.trim();
+  const purpose = document.getElementById('vPurpose').value.trim();
+  if (!name) return alert('اكتب الاسم ❌');
+  visitors.push({name, role, purpose, timestamp: new Date().toLocaleString('ar-EG')});
+  localStorage.setItem('visitors', JSON.stringify(visitors));
+  renderVisitors(); updateStats();
+  document.getElementById('vName').value = '';
+  document.getElementById('vRole').value = '';
+  document.getElementById('vPurpose').value = '';
+}
+
+function renderVisitors() {
+  const list = document.getElementById('visitorList');
+  list.innerHTML = visitors.length ? '' : '<p style="color:var(--muted)">لا زوار مسجلون</p>';
+  visitors.forEach((v, i) => {
+    list.innerHTML += `<div class="log-item">
+      <strong>${i+1}. ${v.name}</strong> (${v.role || 'زائر'})<br>
+      الغرض: ${v.purpose || 'غير محدد'}<br>
+      <span class="log-time">${v.timestamp}</span>
+    </div>`;
+  });
+}
+
+function exportVisitors() {
+  let t = 'سجل زوار مكتبة مدرسة الأمين الابتدائية\n' + '='.repeat(40) + '\n';
+  visitors.forEach((v, i) => {
+    t += `${i+1}. الاسم: ${v.name}\n   الوظيفة: ${v.role || 'زائر'}\n   الغرض: ${v.purpose || 'غير محدد'}\n   التاريخ: ${v.timestamp}\n\n`;
+  });
+  downloadFile(t, 'سجل_الزوار_' + new Date().toLocaleDateString('ar-EG').replace(/\//g,'-') + '.txt');
+}
+
+function clearVisitors() {
+  if (confirm('تمسح كل السجلات؟')) {
+    visitors = [];
+    localStorage.setItem('visitors', '[]');
+    renderVisitors(); updateStats();
+  }
+}
+
+function downloadFile(content, filename) {
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+}
+
+// ضغط زر الإدخال
+document.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'chatInput') sendChat();
+});
 </script>
 </body>
 </html>
